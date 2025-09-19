@@ -158,7 +158,7 @@ class FlattenAndCast(object):
 layer_sizes = [784, 512, 512, 10]
 param_scale = 0.1
 step_size = 0.01
-num_epochs = 50
+num_epochs = 5
 batch_size = 128
 n_targets = 10
 wd=1e-3
@@ -188,8 +188,6 @@ y = one_hot(np.array(mnist_dataset_test.test_labels), n_targets)
 y_onehot = y
 
 #--------------------
-
-
 log_acc, log_nll = [], []
 
 opt_init, opt_update, get_params = optimizers.adam(step_size)
@@ -213,14 +211,14 @@ for epoch in range(num_epochs):
 
     print('\r', f'[Epoch {epoch+1}]: Train Acc: {log_acc[-1]:.3f} | Train NLL: {log_nll[-1]:0.3f}', end='')
 
-
-
-fig, axes = plt.subplots(1,2, figsize=(10,5))
-fig.tight_layout()
-axes[0].plot(log_acc)
-axes[1].plot(log_nll)
-axes[0].title.set_text('Train Acc')
-axes[1].title.set_text('Train NLL')
+#---------------------------------------------
+def visualize_learning_curves(log_acc, log_nll):
+    fig, axes = plt.subplots(1,2, figsize=(10,5))
+    fig.tight_layout()
+    axes[0].plot(log_acc)
+    axes[1].plot(log_nll)
+    axes[0].title.set_text('Train Acc')
+    axes[1].title.set_text('Train NLL')
 
 
 def visualize_predictions(params_all, X_test, y_test, M=4, num_samples=12):
@@ -280,8 +278,7 @@ def visualize_uncertainty_distribution(params_all, X_test, y_test, M=4, num_samp
     # Get ensemble predictions for a subset
     probs = jnp.mean(jnp.array([batched_predict(params_all[i], X_test[:num_samples])[1] for i in range(M)]), axis=0)
     
-    # Calculate different uncertainty metrics
-    max_prob = jnp.max(probs, axis=1)  # Confidence
+    # Calculate entropy (uncertainty metric)
     entropy = -jnp.sum(probs * jnp.log(probs + 1e-15), axis=1)  # Predictive entropy
     
     # Get correct/incorrect predictions
@@ -289,25 +286,16 @@ def visualize_uncertainty_distribution(params_all, X_test, y_test, M=4, num_samp
     y_true = jnp.argmax(y_test[:num_samples], axis=1)
     correct = (y_pred == y_true)
     
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    fig, ax = plt.subplots(1, 1, figsize=(8, 5))
     
-    # Plot confidence distribution
-    axes[0].hist(max_prob[correct], bins=30, alpha=0.7, label='Correct', color='green', density=True)
-    axes[0].hist(max_prob[~correct], bins=30, alpha=0.7, label='Incorrect', color='red', density=True)
-    axes[0].set_xlabel('Max Probability (Confidence)')
-    axes[0].set_ylabel('Density')
-    axes[0].set_title('Confidence Distribution')
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
-    
-    # Plot entropy distribution
-    axes[1].hist(entropy[correct], bins=30, alpha=0.7, label='Correct', color='green', density=True)
-    axes[1].hist(entropy[~correct], bins=30, alpha=0.7, label='Incorrect', color='red', density=True)
-    axes[1].set_xlabel('Predictive Entropy')
-    axes[1].set_ylabel('Density')
-    axes[1].set_title('Uncertainty Distribution')
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
+    # Plot entropy distribution only
+    ax.hist(entropy[correct], bins=30, alpha=0.7, label='Correct', color='green', density=True)
+    ax.hist(entropy[~correct], bins=30, alpha=0.7, label='Incorrect', color='red', density=True)
+    ax.set_xlabel('Predictive Entropy')
+    ax.set_ylabel('Density')
+    ax.set_title('Uncertainty Distribution')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
     plt.show()
@@ -365,7 +353,10 @@ def add_visualizations_to_script():
     print("\n" + "="*50)
     print("VISUALIZATION RESULTS")
     print("="*50)
-    
+
+    # 0. Show learning curves
+    visualize_learning_curves(log_acc, log_nll)
+
     # 1. Show individual predictions
     print("Showing prediction samples...")
     visualize_predictions(params_all, X, y_onehot, M, num_samples=12)
@@ -391,5 +382,4 @@ def add_visualizations_to_script():
     print(f"Average Confidence: {avg_confidence:.4f}")
     print(f"Average Entropy: {avg_entropy:.4f}")
 
-# Usage: Add this line at the very end of your script (after the training plots)
 add_visualizations_to_script()
