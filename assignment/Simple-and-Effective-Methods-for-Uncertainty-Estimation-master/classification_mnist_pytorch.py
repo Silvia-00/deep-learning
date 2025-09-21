@@ -158,7 +158,7 @@ class FlattenAndCast(object):
 layer_sizes = [784, 512, 512, 10]
 param_scale = 0.1
 step_size = 0.01
-num_epochs = 5
+num_epochs = 50
 batch_size = 128
 n_targets = 10
 wd=1e-3
