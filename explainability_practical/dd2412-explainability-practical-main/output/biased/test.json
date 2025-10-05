@@ -1,0 +1,2 @@
+{"bias_pixel": false, "accuracy": 0.2518361210823059, "loss": 4.497302055358887}
+{"bias_pixel": true, "accuracy": 0.9896673560142517, "loss": 0.03426685556769371}

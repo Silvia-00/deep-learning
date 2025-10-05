@@ -1,0 +1,1 @@
+{"bias_pixel": true, "resnet_size": 18, "epochs": 10, "seed": 5807, "learning_rate": 0.001, "weight_decay": 0.0001, "batch_size": 64, "run_id": "biased", "output": "output"}

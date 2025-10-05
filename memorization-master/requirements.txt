@@ -1,0 +1,11 @@
+flax=0.3.4=pypi_0
+jupyterlab=3.0.16=pyhd8ed1ab_0
+matplotlib=3.3.4=py38h578d9bd_0
+numpy=1.20.2=py38h2d18471_0
+optax=0.0.9=pypi_0
+scikit-learn=0.24.2=py38ha9443f7_0
+scipy=1.6.2=py38had2a1c9_1
+seaborn=0.11.1=hd8ed1ab_1
+setuptools=52.0.0=py38h06a4308_0
+torch=1.9.0=pypi_0
+torchvision=0.10.0=pypi_0
